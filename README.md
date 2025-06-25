@@ -56,16 +56,16 @@ After installation, you can use the following interpolation variables in your tm
 
 | Variable | Description | Example Output |
 |----------|-------------|----------------|
-| `#{ccusage_today_cost}` | Today's total cost | `$0.1234` |
-| `#{ccusage_yesterday_cost}` | Yesterday's total cost | `$0.0567` |
-| `#{ccusage_month_cost}` | This month's total cost | `$12.3456` |
-| `#{ccusage_last_month_cost}` | Last month's total cost | `$45.6789` |
+| `#{ccusage_today_cost}` | Today's total cost | `$0.12` |
+| `#{ccusage_yesterday_cost}` | Yesterday's total cost | `$0.06` |
+| `#{ccusage_month_cost}` | This month's total cost | `$12.35` |
+| `#{ccusage_last_month_cost}` | Last month's total cost | `$45.67` |
 | `#{ccusage_today_tokens}` | Today's total tokens | `123K` |
 | `#{ccusage_yesterday_tokens}` | Yesterday's total tokens | `89K` |
 | `#{ccusage_today_input_tokens}` | Today's input tokens | `67K` |
 | `#{ccusage_today_output_tokens}` | Today's output tokens | `56K` |
 | `#{ccusage_today_models}` | Models used today | `opus-4 sonnet-4` |
-| `#{ccusage_total_cost}` | Total cost (all time) | `$123.4567` |
+| `#{ccusage_total_cost}` | Total cost (all time) | `$123.46` |
 | `#{ccusage_total_tokens}` | Total tokens (all time) | `12M` |
 | `#{ccusage_total_input_tokens}` | Total input tokens (all time) | `8M` |
 | `#{ccusage_total_output_tokens}` | Total output tokens (all time) | `4M` |
@@ -96,7 +96,7 @@ set -g status-right "Total: #{ccusage_total_cost} (#{ccusage_total_tokens}) | To
 - Tokens are automatically formatted with K/M suffixes for readability:
   - `1500` → `1K`
   - `1500000` → `1M`
-- Costs are displayed with dollar sign and 4 decimal places: `$0.1234`
+- Costs are displayed with dollar sign and rounded to 2 decimal places: `$0.12`
 
 ## Notes
 

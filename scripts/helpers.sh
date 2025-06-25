@@ -101,13 +101,13 @@ extract_json_value() {
   fi
 }
 
-# Format cost for display (add $ prefix)
+# Format cost for display (add $ prefix, round to 2 decimal places)
 format_cost() {
   local cost="$1"
   if [ -z "$cost" ] || [ "$cost" = "0" ]; then
     echo "\$0.00"
   else
-    printf "\$%.4f" "$cost"
+    printf "\$%.2f" "$cost"
   fi
 }
 

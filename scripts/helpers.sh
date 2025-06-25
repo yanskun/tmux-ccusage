@@ -2,21 +2,45 @@
 
 # Helper functions for ccusage tmux plugin
 
-# Find ccusage executable
+# Find ccusage executable (with security validation)
 find_ccusage() {
+  local ccusage_path=""
+  
+  # Try command in PATH first (safest)
   if command -v ccusage >/dev/null 2>&1; then
-    echo "ccusage"
-  elif [ -f "$HOME/.local/share/mise/installs/node/23.6.0/bin/ccusage" ]; then
-    echo "$HOME/.local/share/mise/installs/node/23.6.0/bin/ccusage"
-  elif [ -f "$HOME/.local/bin/ccusage" ]; then
-    echo "$HOME/.local/bin/ccusage"
-  elif [ -f "/usr/local/bin/ccusage" ]; then
-    echo "/usr/local/bin/ccusage"
-  elif [ -f "/opt/homebrew/bin/ccusage" ]; then
-    echo "/opt/homebrew/bin/ccusage"
+    ccusage_path="ccusage"
   else
-    # Try to find in mise installations
-    find "$HOME/.local/share/mise/installs/node" -name "ccusage" -type f 2>/dev/null | head -1
+    # Check known safe installation locations
+    local safe_paths=(
+      "$HOME/.local/share/mise/installs/node/23.6.0/bin/ccusage"
+      "$HOME/.local/bin/ccusage"
+      "/usr/local/bin/ccusage" 
+      "/opt/homebrew/bin/ccusage"
+    )
+    
+    for path in "${safe_paths[@]}"; do
+      if [ -f "$path" ] && [ -x "$path" ]; then
+        ccusage_path="$path"
+        break
+      fi
+    done
+    
+    # Last resort: find in mise installations (with constraints)
+    if [ -z "$ccusage_path" ] && [ -d "$HOME/.local/share/mise/installs/node" ]; then
+      local found_path
+      found_path=$(find "$HOME/.local/share/mise/installs/node" -maxdepth 3 -name "ccusage" -type f -executable 2>/dev/null | head -1)
+      if [ -n "$found_path" ] && [[ "$found_path" == "$HOME/.local/share/mise/installs/node"* ]]; then
+        ccusage_path="$found_path"
+      fi
+    fi
+  fi
+  
+  # Validate the found executable
+  if [ -n "$ccusage_path" ]; then
+    # Basic sanity check: try to get version (safe operation)
+    if "$ccusage_path" --version >/dev/null 2>&1 || "$ccusage_path" --help >/dev/null 2>&1; then
+      echo "$ccusage_path"
+    fi
   fi
 }
 

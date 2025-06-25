@@ -1,0 +1,46 @@
+# Example tmux configuration with tmux-ccusage
+# This file demonstrates various ways to use tmux-ccusage plugin
+
+# ===== PLUGIN INSTALLATION =====
+# Using TPM (Tmux Plugin Manager)
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'yanskun/tmux-ccusage'
+
+# ===== BASIC STATUS BAR EXAMPLES =====
+
+# Option 1: Simple cost display in status-right
+set -g status-right "#{ccusage_today_cost} | %Y-%m-%d %H:%M"
+
+# Option 2: Cost and token count
+# set -g status-right "#{ccusage_today_cost} #{ccusage_today_tokens} | %H:%M"
+
+# Option 3: Detailed breakdown
+# set -g status-right "#{ccusage_today_input_tokens}→#{ccusage_today_output_tokens} #{ccusage_today_cost} | #{ccusage_today_models}"
+
+# Option 4: Cost comparison (today vs yesterday)
+# set -g status-left "Today: #{ccusage_today_cost} Yesterday: #{ccusage_yesterday_cost} | "
+
+# Option 5: Monthly summary
+# set -g status-right "Month: #{ccusage_month_cost} Today: #{ccusage_today_cost} | %H:%M"
+
+# Option 6: Total usage overview
+# set -g status-right "Total: #{ccusage_total_cost} (#{ccusage_total_tokens}) | Today: #{ccusage_today_cost}"
+
+# ===== ADVANCED EXAMPLES =====
+
+# Full-featured status bar with multiple plugins
+# set -g status-left "#[fg=green]#S:#I:#P#[default] | #{ccusage_today_cost} | "
+# set -g status-right "#{ccusage_today_tokens} | #(date '+%Y-%m-%d %H:%M:%S')"
+
+# Color-coded cost display (adjust colors as needed)
+# set -g status-right "#[fg=colour208]#{ccusage_today_cost}#[default] #[fg=colour39]#{ccusage_today_tokens}#[default] | %H:%M"
+
+# ===== STATUS BAR CONFIGURATION =====
+set -g status-position bottom
+set -g status-interval 5  # Update every 5 seconds (adjust as needed)
+set -g status-left-length 50
+set -g status-right-length 100
+
+# ===== TPM INITIALIZATION =====
+# Keep this line at the very bottom of tmux.conf
+# run '~/.tmux/plugins/tpm/tpm'

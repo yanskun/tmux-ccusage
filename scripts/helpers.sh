@@ -6,11 +6,29 @@
 find_ccusage() {
   local ccusage_path=""
   
-  # Try command in PATH first (safest)
-  if command -v ccusage >/dev/null 2>&1; then
+  # Try bunx ccusage first (handles "Need to install the following packages" automatically)
+  if command -v bunx >/dev/null 2>&1; then
+    # Test if bunx ccusage works
+    if bunx ccusage --version >/dev/null 2>&1 || bunx ccusage --help >/dev/null 2>&1; then
+      ccusage_path="bunx ccusage"
+    fi
+  fi
+  
+  # Fallback to npx ccusage
+  if [ -z "$ccusage_path" ] && command -v npx >/dev/null 2>&1; then
+    # Test if npx ccusage works
+    if npx ccusage --version >/dev/null 2>&1 || npx ccusage --help >/dev/null 2>&1; then
+      ccusage_path="npx ccusage"
+    fi
+  fi
+  
+  # Fallback to direct command in PATH
+  if [ -z "$ccusage_path" ] && command -v ccusage >/dev/null 2>&1; then
     ccusage_path="ccusage"
-  else
-    # Check known safe installation locations
+  fi
+  
+  # Fallback to known safe installation locations
+  if [ -z "$ccusage_path" ]; then
     local safe_paths=(
       "$HOME/.local/share/mise/installs/node/23.6.0/bin/ccusage"
       "$HOME/.local/bin/ccusage"
@@ -37,9 +55,14 @@ find_ccusage() {
   
   # Validate the found executable
   if [ -n "$ccusage_path" ]; then
-    # Basic sanity check: try to get version (safe operation)
-    if "$ccusage_path" --version >/dev/null 2>&1 || "$ccusage_path" --help >/dev/null 2>&1; then
+    # For bunx/npx ccusage, skip validation to avoid double execution
+    if [[ "$ccusage_path" == "bunx ccusage" ]] || [[ "$ccusage_path" == "npx ccusage" ]]; then
       echo "$ccusage_path"
+    else
+      # Basic sanity check for direct commands
+      if $ccusage_path --version >/dev/null 2>&1 || $ccusage_path --help >/dev/null 2>&1; then
+        echo "$ccusage_path"
+      fi
     fi
   fi
 }
@@ -52,7 +75,13 @@ get_ccusage_daily_data() {
   local ccusage_cmd=$(find_ccusage)
   
   if [ -n "$ccusage_cmd" ]; then
-    "$ccusage_cmd" daily --json --since "$since_date" --until "$until_date" 2>/dev/null
+    if [[ "$ccusage_cmd" == "bunx ccusage" ]]; then
+      bunx ccusage daily --json --since "$since_date" --until "$until_date" 2>/dev/null
+    elif [[ "$ccusage_cmd" == "npx ccusage" ]]; then
+      npx ccusage daily --json --since "$since_date" --until "$until_date" 2>/dev/null
+    else
+      "$ccusage_cmd" daily --json --since "$since_date" --until "$until_date" 2>/dev/null
+    fi
   else
     echo "{\"daily\":[], \"totals\":{}}"
   fi
@@ -66,7 +95,13 @@ get_ccusage_monthly_data() {
   local ccusage_cmd=$(find_ccusage)
   
   if [ -n "$ccusage_cmd" ]; then
-    "$ccusage_cmd" monthly --json --since "$since_date" --until "$until_date" 2>/dev/null
+    if [[ "$ccusage_cmd" == "bunx ccusage" ]]; then
+      bunx ccusage monthly --json --since "$since_date" --until "$until_date" 2>/dev/null
+    elif [[ "$ccusage_cmd" == "npx ccusage" ]]; then
+      npx ccusage monthly --json --since "$since_date" --until "$until_date" 2>/dev/null
+    else
+      "$ccusage_cmd" monthly --json --since "$since_date" --until "$until_date" 2>/dev/null
+    fi
   else
     echo "{\"monthly\":[], \"totals\":{}}"
   fi
